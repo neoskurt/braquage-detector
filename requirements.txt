@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pydantic
+tensorflow
+opencv-python
+streamlit
+dlib
+face_recognition
+mtcnn
