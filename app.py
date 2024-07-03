@@ -122,3 +122,23 @@ if st.button("Afficher les Statistiques", key="stats_button"):
         st.image(response.content)
     except requests.exceptions.RequestException as e:
         st.error(f"Erreur lors de la récupération des statistiques : {e}")
+
+# Afficher les graphiques de performance
+st.header("Performances du Modèle")
+if st.button("Afficher les Performances", key="performance_button"):
+    try:
+        response = requests.get("http://localhost:8000/performance")
+        response.raise_for_status()
+        st.image(response.content)
+    except requests.exceptions.RequestException as e:
+        st.error(f"Erreur lors de la récupération des performances : {e}")
+
+# Afficher le graphique du temps de traitement moyen
+st.header("Temps de Traitement Moyen")
+if st.button("Afficher le Temps de Traitement Moyen", key="time_button"):
+    try:
+        response = requests.get("http://localhost:8000/time")
+        response.raise_for_status()
+        st.image(response.content)
+    except requests.exceptions.RequestException as e:
+        st.error(f"Erreur lors de la récupération du temps de traitement moyen : {e}")

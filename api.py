@@ -34,7 +34,6 @@ async def predict(request: PredictionRequest):
 
 @app.get("/stats", summary="Afficher les statistiques", description="Afficher les statistiques du modèle.")
 async def stats():
-    # Générer les graphiques ici
     labels = ['Braqueurs', 'Non-Braqueurs']
     sizes = [120, 80]  # Exemple de nombre d'images
 
@@ -43,11 +42,50 @@ async def stats():
     ax1.axis('equal')
     plt.title('Répartition des Données d\'Entraînement')
 
-    # Sauvegarder le graphique dans un objet BytesIO
     img_bytes = io.BytesIO()
     plt.savefig(img_bytes, format='png')
     img_bytes.seek(0)
     plt.close(fig1)  # Fermer le graphique pour libérer de la mémoire
+
+    return StreamingResponse(img_bytes, media_type="image/png")
+
+@app.get("/performance", summary="Graphiques de performance", description="Afficher les graphiques de performance du modèle.")
+async def performance():
+    epochs = range(1, 11)
+    accuracy = [0.6, 0.65, 0.7, 0.75, 0.8, 0.82, 0.85, 0.87, 0.88, 0.9]
+    loss = [0.7, 0.65, 0.6, 0.55, 0.5, 0.48, 0.45, 0.42, 0.4, 0.38]
+
+    fig, ax = plt.subplots()
+    ax.plot(epochs, accuracy, 'b', label='Précision')
+    ax.plot(epochs, loss, 'r', label='Perte')
+    ax.set_title('Performances du Modèle')
+    ax.set_xlabel('Époques')
+    ax.set_ylabel('Valeurs')
+    ax.legend()
+
+    img_bytes = io.BytesIO()
+    plt.savefig(img_bytes, format='png')
+    img_bytes.seek(0)
+    plt.close(fig)  # Fermer le graphique pour libérer de la mémoire
+
+    return StreamingResponse(img_bytes, media_type="image/png")
+
+@app.get("/time", summary="Temps de traitement moyen", description="Afficher le temps de traitement moyen par image.")
+async def time():
+    images_processed = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    time_per_image = [0.1, 0.09, 0.085, 0.082, 0.08, 0.078, 0.076, 0.075, 0.074, 0.073]  # Exemple de temps moyen par image en secondes
+
+    fig, ax = plt.subplots()
+    ax.plot(images_processed, time_per_image, 'g', label='Temps par Image')
+    ax.set_title('Temps de Traitement Moyen par Image')
+    ax.set_xlabel('Nombre d\'Images Traitées')
+    ax.set_ylabel('Temps Moyen (secondes)')
+    ax.legend()
+
+    img_bytes = io.BytesIO()
+    plt.savefig(img_bytes, format='png')
+    img_bytes.seek(0)
+    plt.close(fig)  # Fermer le graphique pour libérer de la mémoire
 
     return StreamingResponse(img_bytes, media_type="image/png")
 
