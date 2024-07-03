@@ -8,3 +8,5 @@ dlib
 face_recognition
 mtcnn
 pygame
+matplotlib
+pandas

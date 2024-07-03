@@ -3,6 +3,9 @@ from pydantic import BaseModel
 from typing import List
 import uvicorn
 from function import train_model, predict_image
+import io
+import matplotlib.pyplot as plt
+from fastapi.responses import StreamingResponse
 
 app = FastAPI(
     title="Détecteur de Braquage",
@@ -28,6 +31,25 @@ async def predict(request: PredictionRequest):
         return {"prediction": prediction}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/stats", summary="Afficher les statistiques", description="Afficher les statistiques du modèle.")
+async def stats():
+    # Générer les graphiques ici
+    labels = ['Braqueurs', 'Non-Braqueurs']
+    sizes = [120, 80]  # Exemple de nombre d'images
+
+    fig1, ax1 = plt.subplots()
+    ax1.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
+    ax1.axis('equal')
+    plt.title('Répartition des Données d\'Entraînement')
+
+    # Sauvegarder le graphique dans un objet BytesIO
+    img_bytes = io.BytesIO()
+    plt.savefig(img_bytes, format='png')
+    img_bytes.seek(0)
+    plt.close(fig1)  # Fermer le graphique pour libérer de la mémoire
+
+    return StreamingResponse(img_bytes, media_type="image/png")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

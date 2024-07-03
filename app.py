@@ -6,7 +6,6 @@ import numpy as np
 import time
 import pygame
 
-# Charger le détecteur de visage MTCNN
 from mtcnn import MTCNN
 detector = MTCNN()
 
@@ -45,7 +44,7 @@ def capture_and_predict():
             st.error("Erreur lors de la capture de l'image")
             break
 
-        # Détecter les visages
+       # Détecter les visages
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         faces = detector.detect_faces(rgb_frame)
 
@@ -113,3 +112,13 @@ if st.button("Entraîner", key="train_button"):
 # Prédiction en temps réel
 st.header("Prédiction en temps réel")
 capture_and_predict()
+
+# Afficher les graphiques de statistiques
+st.header("Statistiques")
+if st.button("Afficher les Statistiques", key="stats_button"):
+    try:
+        response = requests.get("http://localhost:8000/stats")
+        response.raise_for_status()
+        st.image(response.content)
+    except requests.exceptions.RequestException as e:
+        st.error(f"Erreur lors de la récupération des statistiques : {e}")
