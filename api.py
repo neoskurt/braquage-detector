@@ -14,7 +14,7 @@ app = FastAPI(
 )
 
 class PredictionRequest(BaseModel):
-    image: str  # base64 encoded image
+    image: str
 
 @app.post("/training", summary="Entraîner le modèle", description="Entraîner un modèle de détection de braquage sur les images fournies.")
 async def training():
@@ -35,7 +35,7 @@ async def predict(request: PredictionRequest):
 @app.get("/stats", summary="Afficher les statistiques", description="Afficher les statistiques du modèle.")
 async def stats():
     labels = ['Braqueurs', 'Non-Braqueurs']
-    sizes = [120, 80]  # Exemple de nombre d'images
+    sizes = [120, 80]
 
     fig1, ax1 = plt.subplots()
     ax1.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
@@ -45,7 +45,7 @@ async def stats():
     img_bytes = io.BytesIO()
     plt.savefig(img_bytes, format='png')
     img_bytes.seek(0)
-    plt.close(fig1)  # Fermer le graphique pour libérer de la mémoire
+    plt.close(fig1)
 
     return StreamingResponse(img_bytes, media_type="image/png")
 
@@ -66,14 +66,14 @@ async def performance():
     img_bytes = io.BytesIO()
     plt.savefig(img_bytes, format='png')
     img_bytes.seek(0)
-    plt.close(fig)  # Fermer le graphique pour libérer de la mémoire
+    plt.close(fig)
 
     return StreamingResponse(img_bytes, media_type="image/png")
 
 @app.get("/time", summary="Temps de traitement moyen", description="Afficher le temps de traitement moyen par image.")
 async def time():
     images_processed = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-    time_per_image = [0.1, 0.09, 0.085, 0.082, 0.08, 0.078, 0.076, 0.075, 0.074, 0.073]  # Exemple de temps moyen par image en secondes
+    time_per_image = [0.1, 0.09, 0.085, 0.082, 0.08, 0.078, 0.076, 0.075, 0.074, 0.073]
 
     fig, ax = plt.subplots()
     ax.plot(images_processed, time_per_image, 'g', label='Temps par Image')
@@ -85,7 +85,7 @@ async def time():
     img_bytes = io.BytesIO()
     plt.savefig(img_bytes, format='png')
     img_bytes.seek(0)
-    plt.close(fig)  # Fermer le graphique pour libérer de la mémoire
+    plt.close(fig)
 
     return StreamingResponse(img_bytes, media_type="image/png")
 

@@ -9,18 +9,13 @@ import pygame
 from mtcnn import MTCNN
 detector = MTCNN()
 
-# Initialiser Pygame pour jouer des sons
 pygame.mixer.init()
-
-# Charger le son
 shots_sound = pygame.mixer.Sound('shots.mp3')
 
-# Variables pour suivre la détection du braqueur
 detected_braqueur = False
 start_time = None
 alert_triggered = False
 
-# Seuil de confiance pour considérer un braqueur
 CONFIDENCE_THRESHOLD = 0.50
 
 def capture_and_predict():
@@ -33,7 +28,7 @@ def capture_and_predict():
 
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-    cap.set(cv2.CAP_PROP_BRIGHTNESS, 0.7)  # Ajustez la luminosité si nécessaire
+    cap.set(cv2.CAP_PROP_BRIGHTNESS, 0.7) 
 
     frame_window = st.image([])
     prediction_text = st.empty()
@@ -44,7 +39,6 @@ def capture_and_predict():
             st.error("Erreur lors de la capture de l'image")
             break
 
-       # Détecter les visages
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         faces = detector.detect_faces(rgb_frame)
 
@@ -58,21 +52,20 @@ def capture_and_predict():
 
             try:
                 response = requests.post("http://localhost:8000/predict", json={"image": image_base64})
-                response.raise_for_status()  # Cette ligne déclenchera une exception si la requête échoue
+                response.raise_for_status()
                 prediction = response.json()["prediction"]
                 confidence = prediction['confidence']
                 if confidence > CONFIDENCE_THRESHOLD:
-                    color = (0, 0, 255)  # Rouge pour les braqueurs
+                    color = (0, 0, 255) 
                     braqueur_detected_in_frame = True
                     prediction_text.markdown(f"**Prédiction : Braqueur** **Confiance :** {confidence:.2f}")
                 else:
-                    color = (0, 255, 0)  # Vert pour les non-braqueurs
+                    color = (0, 255, 0) 
                     prediction_text.markdown(f"**Prédiction : Non Braqueur** **Confiance :** {confidence:.2f}")
                 cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
             except requests.exceptions.RequestException as e:
                 prediction_text.markdown(f"Erreur lors de la prédiction : {e}")
 
-        # Logic to check detection duration
         if braqueur_detected_in_frame:
             if not detected_braqueur:
                 detected_braqueur = True
@@ -90,7 +83,6 @@ def capture_and_predict():
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frame_window.image(frame)
 
-        # Ajout d'une pause pour permettre de voir les mises à jour
         cv2.waitKey(1)
 
     cap.release()
@@ -99,21 +91,18 @@ def capture_and_predict():
 st.title("Détecteur de Braquage")
 st.write("Entraînez le modèle ou utilisez la webcam pour une prédiction en temps réel.")
 
-# Entraînement du modèle
 st.header("Entraîner le modèle")
 if st.button("Entraîner", key="train_button"):
     try:
         response = requests.post("http://localhost:8000/training")
-        response.raise_for_status()  # Cette ligne déclenchera une exception si la requête échoue
+        response.raise_for_status() 
         st.write(response.json())
     except requests.exceptions.RequestException as e:
         st.error(f"Erreur lors de l'entraînement : {e}")
 
-# Prédiction en temps réel
 st.header("Prédiction en temps réel")
 capture_and_predict()
 
-# Afficher les graphiques de statistiques
 st.header("Statistiques")
 if st.button("Afficher les Statistiques", key="stats_button"):
     try:
@@ -123,7 +112,6 @@ if st.button("Afficher les Statistiques", key="stats_button"):
     except requests.exceptions.RequestException as e:
         st.error(f"Erreur lors de la récupération des statistiques : {e}")
 
-# Afficher les graphiques de performance
 st.header("Performances du Modèle")
 if st.button("Afficher les Performances", key="performance_button"):
     try:
@@ -133,7 +121,6 @@ if st.button("Afficher les Performances", key="performance_button"):
     except requests.exceptions.RequestException as e:
         st.error(f"Erreur lors de la récupération des performances : {e}")
 
-# Afficher le graphique du temps de traitement moyen
 st.header("Temps de Traitement Moyen")
 if st.button("Afficher le Temps de Traitement Moyen", key="time_button"):
     try:
